@@ -1,8 +1,3 @@
-vis-facetscape
-==============
-
-Visualization for Faceted Search 
-
 -------------------------------------------------------------------------
 =
 = This is a prototypal implementation of the 'FacetScape' visualization
