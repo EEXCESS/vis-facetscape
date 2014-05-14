@@ -1,38 +1,14 @@
--------------------------------------------------------------------------
-=
-= This is a prototypal implementation of the 'FacetScape' visualization
-=
-=
--------------------------------------------------------------------------
-=
-=
-=	This prototype was mainly developed to run in Google Chrome.
-=	
-=	In order for the visualization to run properly you may need to
-=	start an instance of Chrome Browser with the Same Origin Policy
-=	disabled.
-=	
-=	1. Close all instances of Google Chrome
-=	2. Start an instance with the parameter '--disable-web-security'
-=	   (Therefor, open a terminal/console and navigate to the 
-=	    installation directory of your Chrome Browser. 
-=	    Now type in the appropriate command for your OS.) 
-=
-=
-=	   WINDOWS
-=
-=	   chrome.exe --disable-web-security
-=
-=	   MAC
-=
-=	   $ open -a Google\ Chrome --args --disable-web-security
-=
-=	   LINUX
-=
-=	   $ google-chrome --disable-web-security
-=
-=	3. A window of the Chrome browser should appear. Now you can
-=	   open the 'index.html' file in that browser instance and 
-=	   hopefully you see 'FacetScape'.
-=
--------------------------------------------------------------------------
+# FacetScape: A Visualization for Exploring the Search Space
+
+## Usage
+In most browser, just drag and drop the install.html to the browser window.
+Note, that an active internet connection is needed to retrieve the search results from europeana.eu.
+
+Some browser version require to disable the same origin policy in order to retrieve results from 3rd party (non-local) websites. For Chrome do the following:
+* Close all instances of Google Chrome
+* Start an instance with the parameter '--disable-web-security' (Therefor, open a terminal/console and navigate to the installation directory of your Chrome Browser.  Now type in the appropriate command for your OS.) 
+    $ chrome.exe --disable-web-security (WINDOWS)
+    $ open -a Google\ Chrome --args --disable-web-security (OS X)
+    $ google-chrome --disable-web-security (LINUX)
+
+# References
