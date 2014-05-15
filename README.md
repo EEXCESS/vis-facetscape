@@ -15,3 +15,5 @@ Some browser version require to disable the same origin policy in order to retri
     $ google-chrome --disable-web-security (LINUX)
 
 ## References
+Seifert, C.; Jurgovsky, J. & Granitzer, M. FacetScape: A Visualization for Exploring the Search Space Proc. International Conference on Information Visualization (IV), 2014, to appear
+
