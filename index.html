@@ -1,29 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Facet Scape Visualization</title>
-
-    <script type="text/javascript" src="lib/d3.v3.js" charset="utf-8"></script>
-    <script type="text/javascript" src="lib/jquery-2.0.3.js" charset="utf-8"></script>
-    <script type="text/javascript" src="lib/ccp.js" charset="utf-8"></script>
+    <script type="text/javascript" src="lib/d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="lib/jquery-2.1.0.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="lib/clipper_unminified.js" charset="utf-8"></script>
+    <script type="text/javascript" src="lib/jquery.raty.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/ccp.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/facetScape.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/VoronoiPartitioner.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/logging.js" charset="utf-8"></script>
     <link rel="stylesheet" type="text/css" href="facetScape.css">
-
 </head>
 <body>
-<div id="facetScape"></div>
+<div id="facetScapeViz"></div>
+<div id="feedback">
+    <div id="rating" class="rating"></div>
+</div>
 <script>
-    var term = "Loom";
-    var width = 900;
-    var height = 900;
-    var onReceiveData = function(processedData, items) {
-        facetScape(d3.select("body").select("div#facetScape"), width, height, processedData, items, term);
+    PROVIDER.buildFacetScape('Loom', PROVIDER.names.econbiz, d3.select('div#facetScapeViz'), 900, 900);
+    var rating = function(element, score) {
+        element.raty({
+            score: function() {
+                if(score == -1) {
+                    return 2;
+                } else if(score == 1) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            },
+            path: "img",
+            number: 2,
+            width: false,
+            iconRange: [
+                {range: 1, on: 'thumbs-up-on.png', off: 'thumbs-up-off.png'},
+                {range: 2, on: 'thumbs-down-on.png', off: 'thumbs-down-off.png'}
+            ],
+            hints: ['good', 'bad'],
+            single: true,
+            click: function(score, evt) {
+                LOGGING.logRating(score);
+            }
+        });
     }
 
-    requestEuropeana(term, onReceiveData);
-
+    /*
+      Create rating element (thumbs up/down) with intial value 'LOGGING.getRating()'.
+     */
+    rating($("div#rating"), LOGGING.getRating());
 </script>
 </body>
 </html>

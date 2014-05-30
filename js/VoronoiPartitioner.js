@@ -31,6 +31,32 @@ function VoronoiPartitioner(Size) {
 
         var polys = [];
         for(var i = 0; i < cells.length; i++) {
+            if(typeof cells[i].area[0] == "undefined") { return [];}
+            polys.push(cells[i].area[0]);
+        }
+
+        return polys;
+    }
+
+    voronoi.update = function(centroids, weights, movingCentroidIdx) {
+
+        if(typeof(weights) == "undefined") {
+            weights = [];
+            for(var i = 0; i < centroids.length; i++) {
+                weights.push((1.0 / centroids.length));
+            }
+        }
+        if(centroids.length > weights.length) { return null;}
+
+        cells = [];
+        for(var i = 0; i < centroids.length; i++) {
+            cells.push(createCell(centroids[i], weights[i]));
+        }
+
+        partition();
+
+        var polys = [];
+        for(var i = 0; i < cells.length; i++) {
             polys.push(cells[i].area[0]);
         }
 
@@ -63,11 +89,17 @@ function VoronoiPartitioner(Size) {
                     var distance = getDistance(constructed, current);
 
                     var division = 0.0;
-                    if(w1+w2 <= distance) {
-                        division =  (Math.pow(w1, 2) - Math.pow(w2,2) + Math.pow(distance,2)) / (2*distance);
-                    } else {
-                        return;
-                    }
+                    division =  (Math.pow(w1, 2) - Math.pow(w2,2) + Math.pow(distance,2)) / (2*distance);
+//                    if(w1+w2 <= distance) {
+//                        division =  (Math.pow(w1, 2) - Math.pow(w2,2) + Math.pow(distance,2)) / (2*distance);
+//                    } else {
+//                        if(w1 <= distance) {
+//                            division = (w1/w2) * distance;
+//                            console.log(division);
+//                        } else {
+//                            return;
+//                        }
+//                    }
 
                     var vector = {X:(current.X-constructed.X)/distance,Y:(current.Y-constructed.Y)/distance};
                     var center = {X:(constructed.X+vector.X*division),Y:(constructed.Y+vector.Y*division)};
