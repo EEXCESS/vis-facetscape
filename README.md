@@ -16,4 +16,4 @@ Some browser version require to disable the same origin policy in order to retri
 
 ## References
 Seifert, C.; Jurgovsky, J. & Granitzer, M. FacetScape: A Visualization for Exploring the Search Space Proc. International Conference on Information Visualization (IV), 2014, to appear
-
+(use tag "iv2014" to get the version used in the publication)
