@@ -51,7 +51,6 @@ function facetScape(domElem, iwidth, iheight, ifacets, queryResultItems, term) {
     var TAG_PADDING_X = 2;
     var TAG_PADDING_Y = 1;
     var SPIRAL_FERMAT_SCALE = 40;
-    var MAX_LENGTH = 15;
     var maxFrequency;
 
     // Animation
@@ -626,7 +625,7 @@ function facetScape(domElem, iwidth, iheight, ifacets, queryResultItems, term) {
                     maxFrequency = fData[f].tags[0].frequency;
                     for(t = 0; t < fData[f].tags.length; t++) {
                         var l = fData[f].tags[t].word.length;
-                        fData[f].tags[t].wordShort = (l > MAX_LENGTH) ? fData[f].tags[t].word.substring(0, MAX_LENGTH-1) + ".." : fData[f].tags[t].word;
+                        fData[f].tags[t].wordShort = (l > config.TAG_MAX_LENGTH) ? fData[f].tags[t].word.substring(0, config.TAG_MAX_LENGTH-1) + ".." : fData[f].tags[t].word;
                         var fontSize = internal.mapFreqToFontSize(fData[f].tags[t].frequency);
                         var rTag = d3.select("body").append('div').attr("class", "tag").style("font-size",fontSize+"px").text(facetData[f].tags[t].wordShort);
                         fData[f].tags[t].id = t;
@@ -1112,8 +1111,8 @@ function facetScape(domElem, iwidth, iheight, ifacets, queryResultItems, term) {
                 for(var f = 0; f < facetData.length; f++) {
                     var key = facetData[f].name;
                     var tags = facetData[f].tags;
-                    for(var t = 0; t < facetData[f].tags.length; t++) {
-                        facetData[f].tags[t].frequency = 0;
+                    for(var t = 0; t < tags.length; t++) {
+                        tags[t].frequency = 0;
                         var unknownFreq = 0;
                         for(var i = 0; i < selectedResults.length; i++) {
                             if(selectedResults[i].hasOwnProperty(key)) {
@@ -1121,13 +1120,13 @@ function facetScape(domElem, iwidth, iheight, ifacets, queryResultItems, term) {
                                     for(var tt = 0; tt < selectedResults[i][key].length; tt++) {
                                         var canonTag = PROVIDER.getCanonicalString(selectedResults[i][key][tt]);
                                         if(canonTag == PROVIDER.getCanonicalString(facetData[f].tags[t].word)){
-                                            facetData[f].tags[t].frequency++;
+                                            tags[t].frequency++;
                                         }
                                     }
                                 } else {
                                     var canonTag = PROVIDER.getCanonicalString(selectedResults[i][key]);
                                     if(canonTag == PROVIDER.getCanonicalString(facetData[f].tags[t].word)){
-                                        facetData[f].tags[t].frequency++;
+                                        tags[t].frequency++;
                                     }
                                 }
                             } else {

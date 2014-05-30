@@ -71,7 +71,7 @@ var PROVIDER = (function() {
                     }
                     var tags = [];
                     for(var t in facets[key]) {
-                        if(t != "") {
+                        if(t != "" && facets[key][t] > config.MIN_TAG_FREQUENCY_FOR_DISPLAY) {
                             tags.push({"word":t, "frequency":facets[key][t]});
                         }
                     }
@@ -136,7 +136,7 @@ var PROVIDER = (function() {
                     if(typeof facets[facet] != "undefined") {
                         var tags = [];
                         for(var tag in facets[facet]) {
-                            if(tag != "") {
+                            if(tag != "" && facets[facet][tag] > config.MIN_TAG_FREQUENCY_FOR_DISPLAY) {
                                 tags.push({"word":tag, "frequency": facets[facet][tag]});
                             }
                         }
@@ -166,21 +166,22 @@ var PROVIDER = (function() {
             url: 'https://api.econbiz.de/v1/search',
             size: 100,
             fields: [
-                "accessRights",
-                "date",
-                "date_sort",
-                "date_submission",
-                "institution",
-                "isPartOf",
-                "jel",
-                "language",
-                "location",
-                "person",
-                "source",
-                "subject",
-                "type",
-                "type_genre"
+//                "accessRights",
+//                "date",
+//                "date_sort",
+//                "date_submission",
+//                "institution",
+//                "isPartOf",
+//                "jel",
+//                "language",
+//                "location",
+//                "person",
+//                "source",
+                "subject"
+//                "type",
+//                "type_genre"
             ],
+
             request: function(term) {
                 var facetString = '';
                 for(var i = 0; i < internal.econbiz.fields.length; i++) {
@@ -192,15 +193,20 @@ var PROVIDER = (function() {
                     cache: false,
                     dataType: 'jsonp',
                     success: function(data){
-                        var ppFacets = internal.econbiz.preprocessFacets(data);
-                        var ppResults = internal.econbiz.preprocessResults(data);
+                        var otherFacetNames = [];
+                        var tmp = internal.econbiz.preprocessFacets(data)
+                        var  otherFacetNames = tmp.ofNames;
+                        var ppFacets  = tmp.pfacets;
+                        var ppResults = internal.econbiz.preprocessResults(data, otherFacetNames);
                         internal.onReceiveData(term, ppFacets, ppResults);
                     }
                 });
             },
             preprocessFacets: function(data) {
                 var processed = [];
-                var pdata = {}
+                var pdata = {};
+                var otherFacetNames = [];
+                // loop through the result set
                 for(var result in data.hits.hits) {
                     for(var facet in data.hits.hits[result]) {
                         if(!pdata[facet]) {
@@ -227,13 +233,31 @@ var PROVIDER = (function() {
                     var facet = {"name": facetName, "color":'#cccccc', "tags": []};
                     var tags = [];
                     var unknownFreq = 0;
+                    var idx_others = -1; // the index of the "other" facet value
+                    var cnt_others = 0; // accumulates counts for  "other" facet value
                     for(var result in data.hits.hits) {
                         if(!data.hits.hits[result].hasOwnProperty(facetName)) {
                             unknownFreq += 1;
                         }
                     }
+                    // only show tags separately which occur more often than specified in min_tag_frequency
                     for(var tag in pdata[facetName]) {
-                        tags.push({"word": tag, "frequency": pdata[facetName][tag]})
+                        if (pdata[facetName][tag]  > config.MIN_TAG_FREQUENCY_FOR_DISPLAY) {
+                            tags.push({"word": tag, "frequency": pdata[facetName][tag]})
+                        } //else subsume values in tag "others"
+                        else {
+                            if (idx_others == -1) {
+                                tags.push({"word": config.TAG_NAME_OTHERS, "frequency": pdata[facetName][tag]})
+                                otherFacetNames.push(tag);
+                                idx_others = tags.length -1;
+                                cnt_others += pdata[facetName][tag];
+                            } else
+                            {
+                                cnt_others += pdata[facetName][tag];
+                                tags[idx_others] = {"word": config.TAG_NAME_OTHERS, "frequency": cnt_others};
+                                otherFacetNames.push(tag);
+                            }
+                        }
                     }
                     if(tags.length > 0) {
                         if(unknownFreq > 0) {
@@ -243,9 +267,23 @@ var PROVIDER = (function() {
                         processed.push(facet);
                     }
                 }
-                return processed;
+                return {pfacets: processed, ofNames: otherFacetNames};
             },
-            preprocessResults: function(data) {
+            preprocessResults: function(data, otherFacetNames) {
+                // rename  all facets values contained in  otherFacetNames.push(tag) to config.TAG_NAME_OTHERS
+                for(var fIdx in internal.econbiz.fields) {
+                    var facet = internal.econbiz.fields[fIdx];
+                      for(var result in data.hits.hits) {
+                          if (data.hits.hits[result][facet] instanceof Array) {
+                              for (var tt = 0; tt < data.hits.hits[result][facet].length; tt++) {
+                                  var value = data.hits.hits[result][facet][tt];
+                                  if (otherFacetNames.indexOf(value) != -1) {
+                                      data.hits.hits[result][facet][tt] = config.TAG_NAME_OTHERS;
+                                  }
+                              }
+                          }
+                      }
+                    }
                 return data.hits.hits;
             }
         }
