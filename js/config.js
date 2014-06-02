@@ -9,6 +9,7 @@ var config = {
     MIN_TAG_FREQUENCY_FOR_DISPLAY : 3,
     // name of the facet values where all values with only few results are aggregated into
     TAG_NAME_OTHERS: 'others',
-    TAG_MAX_LENGTH : 30
+    TAG_MAX_LENGTH : 30,
+    USE_TAG_OTHERS: false
 }
 

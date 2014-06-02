@@ -246,16 +246,17 @@ var PROVIDER = (function() {
                             tags.push({"word": tag, "frequency": pdata[facetName][tag]})
                         } //else subsume values in tag "others"
                         else {
-                            if (idx_others == -1) {
-                                tags.push({"word": config.TAG_NAME_OTHERS, "frequency": pdata[facetName][tag]})
-                                otherFacetNames.push(tag);
-                                idx_others = tags.length -1;
-                                cnt_others += pdata[facetName][tag];
-                            } else
-                            {
-                                cnt_others += pdata[facetName][tag];
-                                tags[idx_others] = {"word": config.TAG_NAME_OTHERS, "frequency": cnt_others};
-                                otherFacetNames.push(tag);
+                            if (config.USE_TAG_OTHERS) {
+                                if (idx_others == -1) {
+                                    tags.push({"word": config.TAG_NAME_OTHERS, "frequency": pdata[facetName][tag]})
+                                    otherFacetNames.push(tag);
+                                    idx_others = tags.length - 1;
+                                    cnt_others += pdata[facetName][tag];
+                                } else {
+                                    cnt_others += pdata[facetName][tag];
+                                    tags[idx_others] = {"word": config.TAG_NAME_OTHERS, "frequency": cnt_others};
+                                    otherFacetNames.push(tag);
+                                }
                             }
                         }
                     }
@@ -271,19 +272,21 @@ var PROVIDER = (function() {
             },
             preprocessResults: function(data, otherFacetNames) {
                 // rename  all facets values contained in  otherFacetNames.push(tag) to config.TAG_NAME_OTHERS
-                for(var fIdx in internal.econbiz.fields) {
-                    var facet = internal.econbiz.fields[fIdx];
-                      for(var result in data.hits.hits) {
-                          if (data.hits.hits[result][facet] instanceof Array) {
-                              for (var tt = 0; tt < data.hits.hits[result][facet].length; tt++) {
-                                  var value = data.hits.hits[result][facet][tt];
-                                  if (otherFacetNames.indexOf(value) != -1) {
-                                      data.hits.hits[result][facet][tt] = config.TAG_NAME_OTHERS;
-                                  }
-                              }
-                          }
-                      }
+                if (config.USE_TAG_OTHERS) {
+                    for (var fIdx in internal.econbiz.fields) {
+                        var facet = internal.econbiz.fields[fIdx];
+                        for (var result in data.hits.hits) {
+                            if (data.hits.hits[result][facet] instanceof Array) {
+                                for (var tt = 0; tt < data.hits.hits[result][facet].length; tt++) {
+                                    var value = data.hits.hits[result][facet][tt];
+                                    if (otherFacetNames.indexOf(value) != -1) {
+                                        data.hits.hits[result][facet][tt] = config.TAG_NAME_OTHERS;
+                                    }
+                                }
+                            }
+                        }
                     }
+                }
                 return data.hits.hits;
             }
         }
